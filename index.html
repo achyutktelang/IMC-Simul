@@ -133,6 +133,14 @@
     <div class="grid">
         <!-- User Controls -->
         <main>
+            <!-- Corporate Background Briefing Box -->
+            <div class="card" style="border-left: 6px solid var(--primary); background: #f8fafc;">
+                <h2>Corporate Overview & Strategic Task</h2>
+                <p style="font-size: 0.9rem; margin-bottom: 0;">
+                    <strong>VoltCharge India</strong> is launching its flagship high-performance electric SUV (**Model S: ₹1,45,000 unit baseline value**). Backed by a competitive <strong>₹50,000 unit margin</strong>, the firm needs a calculated Integrated Marketing Communications (IMC) matrix. Your boardroom objective is to align consumer psychology with strict budgetary constraints across changing seasonal cycles.
+                </p>
+            </div>
+
             <div class="card">
                 <h2>1. Communication Strategy (Belch & Purani Model)</h2>
                 <div class="slider-group">
@@ -202,7 +210,7 @@
                 </tr>
             </thead>
             <tbody id="historyBody">
-                <!-- Dynamically populated rows will appear here -->
+                <!-- Data populated here on strategy lock -->
             </tbody>
         </table>
     </div>
@@ -210,9 +218,9 @@
 
 <script>
     let currentQuarter = 1;
-    const budgetCap = 4.00; // ₹4.00 Crores
+    const budgetCap = 4.00; // ₹4.00 Crores Cap
 
-    // Elements
+    // Cache core UI nodes
     const slAwareness = document.getElementById('slAwareness');
     const slCreative = document.getElementById('slCreative');
     const slDigital = document.getElementById('slDigital');
@@ -230,23 +238,5 @@
     const qTitle = document.getElementById('qTitle');
     const qBadge = document.getElementById('qBadge');
     const newsBox = document.getElementById('newsBox');
+    const submitBtn = document.getElementById('submitBtn');
 
-    // Live update function
-    function updateCalculations() {
-        // Update value labels
-        vAwareness.innerText = slAwareness.value + '%';
-        vCreative.innerText = slCreative.value + '% Rational / ' + (100 - slCreative.value) + '% Emotional';
-        vDigital.innerText = slDigital.value;
-        vOoh.innerText = slOoh.value;
-
-        // Calculate Cost (Digital: 1.5L/point, OOH: 2L/point)
-        let digitalCostCr = (slDigital.value * 150000) / 10000000;
-        let oohCostCr = (slOoh.value * 200000) / 10000000;
-        let totalSpent = digitalCostCr + oohCostCr;
-
-        lblSpent.innerText = '₹' + totalSpent.toFixed(2) + ' Cr';
-
-        if (totalSpent > budgetCap) {
-            lblSpent.style.color = 'var(--danger)';
-            lblRoi.innerText = 'Budget Overrun!';
-            lblRoi.style.color = 'var(--danger)';
