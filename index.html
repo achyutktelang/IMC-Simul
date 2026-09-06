@@ -3,10 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoltCharge India: Strategic Boardroom Simulation</title>
-    <!-- Please find the complete simulation HTML, CSS, and JS code structure in the provided original response or use the updated string-concatenated ledger builder for robustness. -->
+    <title>VoltCharge: 3-Quarter IMC Simulation</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --accent: #2563eb;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .wrapper { max-width: 1100px; margin: 0 auto; }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .quarter-indicator {
+            background-color: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .q-badge {
+            background-color: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .news-flash {
+            background-color: #fffbeb;
+            border-left: 6px solid var(--warning);
+            padding: 18px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        @media (min-width: 768px) { .grid { grid-template-columns: 2fr 1fr; } }
+
+        .card {
+            background: var(--card);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .card h2 { margin-top: 0; font-size: 1.25rem; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;}
+
+        .slider-group { margin-bottom: 20px; }
+        .slider-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+        .slider-flex { display: flex; align-items: center; gap: 15px; }
+        input[type="range"] { flex-grow: 1; accent-color: var(--accent); }
+        .val-box { min-width: 60px; text-align: right; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+
+        .btn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #15803d; }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .history-table th, .history-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            text-align: center;
+        }
+        .history-table th { background-color: #f8fafc; }
+    </style>
 </head>
 <body>
-    <!-- (Full code containing the VoltCharge India simulation interface and safe string-concatenation ledger logic as provided in the repository source). -->
-</body>
-</html>
+
+<div class="wrapper">
+    <header>
+        <h1 style="margin:0 0 5px 0;">VoltCharge EV: Strategic IMC Boardroom Simulation</h1>
+        <p style="margin:0; opacity:0.9;">Manage Objectives, Budgets, and Changing Market Shocks Over 3 Quarters</p>
+    </header>
+
+    <div class="quarter-indicator">
+        <div><strong>Current Timeline:</strong> <span id="qTitle">Quarter 1: The Grand Launch</span></div>
+        <div class="q-badge" id="qBadge">Q1</div>
+    </div>
+
+    <div class="news-flash" id="newsBox">
+        <strong>🗞️ Market Environment:</strong> The Indian EV market is booming. Consumer sentiment is high. Your objective this quarter is to secure baseline brand awareness using high-reach vehicles under your initial **₹4.00 Crore** quarterly budget.
+    </div>
+
+    <div class="grid">
+        <!-- User Controls -->
+        <main>
+            <div class="card">
+                <h2>1. Communication Strategy (Belch & Purani Model)</h2>
+                <div class="slider-group">
+                    <label>Target Awareness Increase Benchmark (DAGMAR)</label>
+                    <div class="slider-flex">
+                        <input type="range" id="slAwareness" min="5" max="50" value="25">
+                        <span class="val-box" id="vAwareness">25%</span>
+                    </div>
+                </div>
+                <div class="slider-group">
+                    <label>Creative Appeal Mix (Rational vs Emotional)</label>
+                    <div class="slider-flex">
+                        <input type="range" id="slCreative" min="0" max="100" value="50">
+                        <span class="val-box" id="vCreative">50% Rational</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>2. Media Vehicle Deployment</h2>
+                <div class="slider-group">
+                    <label>Digital & OTT Video GRPs (Cost: ₹1.5L / Point)</label>
+                    <div class="slider-flex">
+                        <input type="range" id="slDigital" min="0" max="300" value="100">
+                        <span class="val-box" id="vDigital">100</span>
+                    </div>
+                </div>
+                <div class="slider-group">
+                    <label>Hyperlocal OOH & Experiential GRPs (Cost: ₹2.0L / Point)</label>
+                    <div class="slider-flex">
+                        <input type="range" id="slOoh" min="0" max="200" value="50">
+                        <span class="val-box" id="vOoh">50</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" id="submitBtn" onclick="advanceQuarter()">Lock Strategy & Process Quarter Results</button>
+        </main>
+
+        <!-- Current Performance Panel -->
+        <aside>
+            <div class="card" style="border-top: 6px solid var(--accent); position: sticky; top: 20px;">
+                <h2>Quarterly Report</h2>
+                <p><strong>Quarterly Budget Cap:</strong> <span id="lblBudgetCap">₹4.00 Cr</span></p>
+                <p><strong>Est. Funds Utilized:</strong> <span id="lblSpent" style="font-weight:bold;">₹2.50 Cr</span></p>
+                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin:15px 0;">
+                <p><strong>Quarter ROI Impact:</strong> <span id="lblRoi" style="font-size: 1.5rem; font-weight:800; color:var(--accent);">Evaluating...</span></p>
+                <div id="feedbackText" style="font-size:0.9rem; color:var(--muted); background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e2e8f0;">
+                    Adjust sliders to build your strategy before submitting.
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Corporate Scorecard History -->
+    <div class="card" style="margin-top: 25px;">
+        <h2>Executive Performance Ledger (LMS Evaluation Sheet)</h2>
+        <p style="font-size:0.85rem; color:var(--muted);">Students must screenshot this finalized block at the end of the workshop for evaluation.</p>
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Quarter</th>
+                    <th>Target Awareness</th>
+                    <th>Creative Mix (Rat/Emo)</th>
+                    <th>Budget Used</th>
+                    <th>Performance ROI Status</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody">
+                <!-- Dynamically populated rows will appear here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let currentQuarter = 1;
+    const budgetCap = 4.00; // ₹4.00 Crores
+
+    // Elements
+    const slAwareness = document.getElementById('slAwareness');
+    const slCreative = document.getElementById('slCreative');
+    const slDigital = document.getElementById('slDigital');
+    const slOoh = document.getElementById('slOoh');
+
+    const vAwareness = document.getElementById('vAwareness');
+    const vCreative = document.getElementById('vCreative');
+    const vDigital = document.getElementById('vDigital');
+    const vOoh = document.getElementById('vOoh');
+
+    const lblSpent = document.getElementById('lblSpent');
+    const lblRoi = document.getElementById('lblRoi');
+    const feedbackText = document.getElementById('feedbackText');
+    const historyBody = document.getElementById('historyBody');
+    const qTitle = document.getElementById('qTitle');
+    const qBadge = document.getElementById('qBadge');
+    const newsBox = document.getElementById('newsBox');
+
+    // Live update function
+    function updateCalculations() {
+        // Update value labels
+        vAwareness.innerText = slAwareness.value + '%';
+        vCreative.innerText = slCreative.value + '% Rational / ' + (100 - slCreative.value) + '% Emotional';
+        vDigital.innerText = slDigital.value;
+        vOoh.innerText = slOoh.value;
+
+        // Calculate Cost (Digital: 1.5L/point, OOH: 2L/point)
+        let digitalCostCr = (slDigital.value * 150000) / 10000000;
+        let oohCostCr = (slOoh.value * 200000) / 10000000;
+        let totalSpent = digitalCostCr + oohCostCr;
+
+        lblSpent.innerText = '₹' + totalSpent.toFixed(2) + ' Cr';
+
+        if (totalSpent > budgetCap) {
+            lblSpent.style.color = 'var(--danger)';
+            lblRoi.innerText = 'Budget Overrun!';
+            lblRoi.style.color = 'var(--danger)';
