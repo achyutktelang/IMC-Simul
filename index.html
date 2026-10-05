@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoltCharge India — Strategic IMC Simulation</title>
+<title>VoltCharge India — Strategic IMC Simulation | Build 4.2</title>
 <style>
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f4f7fb;color:#172033}
@@ -70,7 +70,10 @@
 <div class="app">
   <div class="topbar">
     <div class="brand">VoltCharge India</div>
-    <div id="quarterPill" class="pill hidden"></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+      <div id="quarterPill" class="pill hidden"></div>
+      <div class="pill" title="Use this label to confirm the latest classroom version is live">Build 4.2 • Submit First</div>
+    </div>
   </div>
 
   <section id="start" class="card hero">
@@ -78,7 +81,7 @@
     <p class="muted">
       You are the communication strategist for VoltCharge Model S.
       Make decisions across four changing market conditions. Your strategic performance
-      is evaluated internally, but your score is revealed only after Q4.
+      is evaluated internally, but Q4 results and your final score are revealed only after the completed attempt is submitted.
     </p>
     <div class="formgrid">
       <div class="field">
@@ -182,7 +185,7 @@
   <section id="final" class="hidden">
     <div id="submissionGate" class="card">
       <h2>Submit Your Simulation</h2>
-      <p class="muted">Your four quarters are complete. Your score is still hidden. Submit your completed attempt to your instructor to unlock your final score and performance dashboard.</p>
+      <p class="muted"><strong>Your attempt is now locked.</strong> Q4 results, quarter scores, the final score, dashboard and charts are hidden until this completed attempt is submitted. If this page is refreshed or reopened before submission, you will return to this same locked screen.</p>
       <div class="vc-submit-gate">
         <button id="submitResultBtn" class="vc-action vc-primary" onclick="submitFinalResult()">Submit and See Your Score</button>
         <div id="submitStatus" class="vc-note" aria-live="polite"></div>
@@ -326,6 +329,7 @@ const quarters = [
 ];
 
 const VC_HISTORY_KEY="voltcharge_imc_history_v3";
+const VC_PENDING_KEY="voltcharge_imc_pending_submission_v42";
 let current=0;
 let results=[];
 let choices={};
@@ -407,6 +411,13 @@ function setToolbarVisible(visible){
 }
 
 function startGame(){
+  // A completed attempt cannot be discarded by refreshing/restarting before submission.
+  if(localStorage.getItem(VC_PENDING_KEY)){
+    restorePendingAttempt();
+    alert("Your previous completed attempt is awaiting submission. Submit it before starting another attempt.");
+    return;
+  }
+
   const name=document.getElementById("studentName").value.trim();
   const roll=document.getElementById("rollNo").value.trim();
   if(!name || !roll){alert("Please enter your name and roll number.");return;}
@@ -576,7 +587,12 @@ function runQuarter(){
   // Critical integration: the simulation result and saved/downloadable result are the SAME object.
   results[current]=result;
   vcRecordQuarter(current,result);
-  showSavedQuarter(current);
+
+  // Q1-Q3 show market response so students can learn and adapt.
+  // Q4 is different: once the final decision is locked, the attempt must be
+  // submitted BEFORE Q4 outcomes, scores, dashboard or charts are revealed.
+  if(current===3) showFinal();
+  else showSavedQuarter(current);
 }
 
 function populateResult(index){
@@ -593,7 +609,7 @@ function populateResult(index){
   document.getElementById("rDigital").textContent=(quarters[index].budget*r.choices.digital/100).toFixed(2)+" Cr";
   document.getElementById("rSocial").textContent=(quarters[index].budget*r.choices.social/100).toFixed(2)+" Cr";
   document.getElementById("feedbackText").textContent=r.feedback;
-  document.getElementById("nextBtn").textContent=index===3?"View Final Performance":"Next Quarter";
+  document.getElementById("nextBtn").textContent=index===3?"Submit Completed Attempt":"Next Quarter";
 }
 
 function showSavedQuarter(index){
@@ -640,6 +656,49 @@ function showFinal(){
     quarters:results.map((r,i)=>({quarter:qLabel(i),...r}))
   };
   syncHistoryFromResults();
+
+  // Persist the completed-but-unsubmitted attempt. This closes the refresh loophole:
+  // refreshing or reopening the page restores this gate instead of starting a new try.
+  try{
+    localStorage.setItem(VC_PENDING_KEY,JSON.stringify({
+      results:results,
+      finalResults:window.finalResults,
+      history:window.vcHistory
+    }));
+  }catch(err){console.error("Could not persist pending attempt",err);}
+}
+
+function restorePendingAttempt(){
+  let pending=null;
+  try{pending=JSON.parse(localStorage.getItem(VC_PENDING_KEY)||"null");}catch(err){pending=null;}
+  if(!pending || !Array.isArray(pending.results) || pending.results.length!==4 || !pending.finalResults) return false;
+
+  results=pending.results;
+  current=3;
+  choices=results[3]?.choices?{...results[3].choices}:{};
+  drafts={};
+  results.forEach((r,i)=>{if(r?.choices) drafts[i]={...r.choices};});
+  window.finalResults=pending.finalResults;
+  window.vcHistory=Array.isArray(pending.history)?pending.history:[];
+  window.vcScoreUnlocked=false;
+
+  const name=window.finalResults?.student?.name||"";
+  const roll=window.finalResults?.student?.roll||"";
+  if(name) sessionStorage.setItem("vcStudent",name);
+  if(roll) sessionStorage.setItem("vcRoll",roll);
+
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("quarterPill").classList.add("hidden");
+  document.getElementById("final").classList.remove("hidden");
+  document.getElementById("submissionGate").classList.remove("hidden");
+  document.getElementById("postSubmitContent").classList.add("hidden");
+  const btn=document.getElementById("submitResultBtn");
+  const status=document.getElementById("submitStatus");
+  if(btn){btn.disabled=false;btn.textContent="Submit and See Your Score";}
+  if(status) status.textContent="This completed attempt is awaiting submission.";
+  setToolbarVisible(false);
+  return true;
 }
 
 function renderBarChart(containerId,values,maxValue,formatter){
@@ -771,7 +830,14 @@ function vcGoBack(){
   const panel=document.getElementById("vcHistoryPanel");
   if(panel){panel.remove();return;}
   const finalVisible=!document.getElementById("final").classList.contains("hidden");
-  if(finalVisible){showSavedQuarter(3);return;}
+  if(finalVisible){
+    if(window.vcScoreUnlocked!==true){
+      alert("This completed attempt is locked until it is submitted.");
+      return;
+    }
+    showSavedQuarter(3);
+    return;
+  }
   const gameVisible=!document.getElementById("game").classList.contains("hidden");
   if(!gameVisible) return;
 
@@ -784,6 +850,11 @@ function vcGoBack(){
 }
 
 function vcStartNewSimulation(){
+  if(localStorage.getItem(VC_PENDING_KEY) && window.vcScoreUnlocked!==true){
+    alert("Submit the completed attempt before starting a new simulation.");
+    restorePendingAttempt();
+    return;
+  }
   if(!confirm("Start a new simulation? This will clear the saved results from this browser.")) return;
   localStorage.removeItem(VC_HISTORY_KEY);
   sessionStorage.removeItem("vcStudent");
@@ -807,6 +878,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   window.vcHistory=JSON.parse(localStorage.getItem(VC_HISTORY_KEY)||"[]");
   window.vcScoreUnlocked=false;
   setToolbarVisible(false);
+  restorePendingAttempt();
 });
 
 // Initialize labels on the start screen without creating a draft result.
@@ -876,6 +948,9 @@ function submitFinalResult(){
   fetch(VOLTCHARGE_SUBMIT_ENDPOINT,{
     method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)
   }).then(()=>{
+    // In no-cors mode the browser can confirm the request was dispatched, but cannot
+    // inspect Google's response body. Your existing Sheet endpoint is already in use.
+    localStorage.removeItem(VC_PENDING_KEY);
     if(btn) btn.textContent="✓ Submitted";
     if(status) status.textContent="Submission sent. Your score is now unlocked.";
     revealFinalResults();
