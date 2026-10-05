@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoltCharge India — Strategic IMC Simulation | Build 4.2</title>
+<title>VoltCharge India — Strategic IMC Simulation | Build 4.3</title>
 <style>
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f4f7fb;color:#172033}
@@ -72,7 +72,7 @@
     <div class="brand">VoltCharge India</div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
       <div id="quarterPill" class="pill hidden"></div>
-      <div class="pill" title="Use this label to confirm the latest classroom version is live">Build 4.2 • Submit First</div>
+      <div class="pill" title="Use this label to confirm the latest classroom version is live">Build 4.3 • Submit First</div>
     </div>
   </div>
 
@@ -223,7 +223,10 @@
           <div class="vc-chart-card"><h3>Quarter Score</h3><div id="chartScore"></div></div>
           <div class="vc-chart-card"><h3>Brand Awareness</h3><div id="chartAwareness"></div></div>
           <div class="vc-chart-card"><h3>Estimated Sales</h3><div id="chartSales"></div></div>
-          <div class="vc-chart-card"><h3>ROI</h3><div id="chartROI"></div></div>
+          <div class="vc-chart-card"><h3>ROI (revenue / budget)</h3><div id="chartROI"></div></div>
+          <div class="vc-chart-card"><h3>Estimated Reach (millions)</h3><div id="chartReach"></div></div>
+          <div class="vc-chart-card"><h3>Leads</h3><div id="chartLeads"></div></div>
+          <div class="vc-chart-card"><h3>Revenue (₹ crore)</h3><div id="chartRevenue"></div></div>
         </div>
       </div>
 
@@ -636,6 +639,13 @@ function nextQuarter(){
 }
 
 function showFinal(){
+  if(window.vcScoreUnlocked===true && window.finalResults){
+    document.getElementById("game").classList.add("hidden");
+    document.getElementById("final").classList.remove("hidden");
+    document.getElementById("quarterPill").classList.add("hidden");
+    revealFinalResults();
+    return;
+  }
   if(!simulationComplete()){alert("Please complete all four quarters first.");return;}
   document.getElementById("game").classList.add("hidden");
   document.getElementById("quarterPill").classList.add("hidden");
@@ -713,6 +723,9 @@ function renderBarChart(containerId,values,maxValue,formatter){
 }
 
 function renderFinalCharts(){
+  renderBarChart("chartReach",results.map(r=>r.reach),null,v=>v.toFixed(1)+"M");
+  renderBarChart("chartLeads",results.map(r=>r.leads),null,v=>Math.round(v).toLocaleString());
+  renderBarChart("chartRevenue",results.map(r=>r.revenue),null,v=>"₹"+v.toFixed(1)+" Cr");
   renderBarChart("chartScore",results.map(r=>r.score),25,v=>v.toFixed(1)+"/25");
   renderBarChart("chartAwareness",results.map(r=>r.awareness),100,v=>v.toFixed(0)+"%");
   renderBarChart("chartSales",results.map(r=>r.sales),null,v=>Math.round(v).toLocaleString());
